@@ -18,9 +18,9 @@ test.describe('Royal Blue - Navigation Tests', () => {
         await homePage.navbarLinks.menu.click();
         await expect(page.locator('#menu')).toBeVisible();
 
-        // Check events section (should go to /events page)
+        // Check events section (In Royal Blue, navbar link is a hash link)
         await homePage.navbarLinks.events.click();
-        await expect(page).toHaveURL(/.*\/events/);
+        await expect(page).toHaveURL(/.*#events/);
     });
 
     test('should verify hero buttons work', async ({ page }) => {
