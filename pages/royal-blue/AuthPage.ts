@@ -19,16 +19,16 @@ export class AuthPage extends BasePage {
 
     constructor(page: Page) {
         super(page);
-        // Using more robust selectors that work for both login and register if possible
-        this.emailInput = page.locator('input[name="email"], input#email, input[type="email"]').first();
-        this.passwordInput = page.locator('input[name="password"], input#password, input[type="password"]').first();
+        // Using strict locators without .first() to avoid matching hidden overlays
+        this.emailInput = page.locator('input[name="email"]');
+        this.passwordInput = page.locator('input[name="password"]');
         this.loginButton = page.locator('button:has-text("Login")');
         
-        this.registerLink = page.locator("text=Create Account, text=Register").first();
-        this.firstNameInput = page.locator('input[name="first_name"], input#first_name').first();
-        this.lastNameInput = page.locator('input[name="last_name"], input#last_name').first();
-        this.phoneInput = page.locator('input[name="phone"], input#phone').first();
-        this.confirmPasswordInput = page.locator('input[name="confirm_password"], input#confirm_password').first();
+        this.registerLink = page.locator('a:has-text("Register"), a:has-text("Create Account")');
+        this.firstNameInput = page.locator('input[name="first_name"]');
+        this.lastNameInput = page.locator('input[name="last_name"]');
+        this.phoneInput = page.locator('input[name="phone"]');
+        this.confirmPasswordInput = page.locator('input[name="confirm_password"]');
         this.createAccountButton = page.locator('button:has-text("Create Account")');
     }
 
