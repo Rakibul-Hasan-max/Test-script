@@ -17,7 +17,7 @@ test.describe('Royal Blue - Footer and Policy Tests', () => {
         await expect(footer).toBeVisible();
         
         // Verify footer brand
-        await expect(footer.locator('h3:has-text("Royal Blue")')).toBeVisible();
+        await expect(footer.locator('span:has-text("Royal Blue")')).toBeVisible();
         
         // Verify Opening Hours
         await expect(footer.locator('h4:has-text("Opening Hours")')).toBeVisible();
