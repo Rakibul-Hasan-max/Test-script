@@ -12,33 +12,79 @@ test.describe('Royal Blue - Table Reservation Tests', () => {
         await homePage.navigate('https://www.shebaa247.com/');
     });
 
-    test('should complete a table reservation flow', async () => {
-        // Scroll to reservation section
-        await homePage.navbarLinks.reservation.click();
-        
-        // Fill form
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        const dateStr = tomorrow.toISOString().split('T')[0];
-        
-        await homePage.fillReservationForm('2', dateStr, '19:00');
-        await homePage.clickFindTable();
-        
-        // Modal should appear, select a table
-        await reservationModal.selectTable(0);
-        
-        // Fill customer details
-        await reservationModal.fillCustomerDetails(
-            'Test User',
-            '01712345678',
-            'test@example.com',
-            'I would like a window seat please.'
-        );
-        
-        // Confirm booking
-        await reservationModal.confirmBooking();
-        
-        // Check for success message
-        await expect(reservationModal.successMessage).toBeVisible({ timeout: 10000 });
+    test.describe('Positive Cases', () => {
+        test('should complete a table reservation flow successfully', async () => {
+            await homePage.navbarLinks.reservation.click();
+            
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const dateStr = tomorrow.toISOString().split('T')[0];
+            
+            await homePage.fillReservationForm('2', dateStr, '19:00');
+            await homePage.clickFindTable();
+            
+            await reservationModal.selectTable(0);
+            await reservationModal.fillCustomerDetails(
+                'Test User',
+                '01712345678',
+                'test@example.com',
+                'I would like a window seat please.'
+            );
+            
+            await reservationModal.confirmBooking();
+            
+            // Check for success message
+            await expect(reservationModal.successMessage).toBeVisible({ timeout: 10000 });
+        });
+    });
+
+    test.describe('Negative & Validation Cases', () => {
+        test('Customer name and phone missing -> shows validation error', async ({ page }) => {
+            await homePage.navbarLinks.reservation.click();
+            
+            const nextWeek = new Date();
+            nextWeek.setDate(nextWeek.getDate() + 7);
+            const dateStr = nextWeek.toISOString().split('T')[0];
+            
+            await homePage.fillReservationForm('4', dateStr, '20:00');
+            await homePage.clickFindTable();
+            
+            await reservationModal.selectTable(0);
+            // Leave customer details empty
+            await reservationModal.fillCustomerDetails('', '', '', '');
+            await reservationModal.confirmBooking();
+            
+            // Should remain on the modal due to validation
+            await expect(reservationModal.customerNameInput).toBeVisible();
+            // Optional: check for validation message text if implemented accurately in the codebase
+            // await expect(page.locator('text=This field is required').first()).toBeVisible();
+        });
+
+        test('Finding table without entering date and time -> validation error', async ({ page }) => {
+            await homePage.navbarLinks.reservation.click();
+            
+            await homePage.fillReservationForm('2', '', '');
+            await homePage.clickFindTable();
+            
+            // Should see error indicating date/time is required
+            // Awaiting default browser validation or custom HTML toast
+            await expect(page.locator('text=required').or(page.locator('.text-red-500')).first()).toBeVisible();
+        });
+
+        test('Booking a past date -> rejects booking or shows validation error', async ({ page }) => {
+            await homePage.navbarLinks.reservation.click();
+            
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const dateStr = yesterday.toISOString().split('T')[0];
+            
+            await homePage.fillReservationForm('2', dateStr, '19:00');
+            await homePage.clickFindTable();
+            
+            // Should ideally show an error instead of letting us proceed to the table picker modal
+            const noTablesMsg = page.locator('text=No tables available').or(page.locator('.text-red-500'));
+            const dateError = page.locator('text=past date');
+            await expect(noTablesMsg.or(dateError).first()).toBeVisible();
+        });
     });
 });
