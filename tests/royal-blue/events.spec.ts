@@ -12,7 +12,8 @@ test.describe('Royal Blue - Event Booking Tests', () => {
     test.describe('Positive Cases', () => {
         test('should verify event details can be viewed', async ({ page }) => {
             await eventsPage.openEventDetails(0);
-            await expect(page.locator("text=Venue Details")).toBeVisible();
+            // Verify modal opens by checking for the 'Amenities' header which is present in the details view
+            await expect(page.locator("text=Amenities")).toBeVisible();
         });
 
         test('should allow user to check event availability with correct inputs', async ({ page }) => {
