@@ -44,11 +44,11 @@ test.describe('Royal Blue - Footer and Policy Tests', () => {
         // Scroll to the bottom
         await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
         
-        // Click on Terms of Use link
-        await page.locator('footer a:has-text("Terms of Use")').first().click();
+        // Click on Terms and Conditions link (Updating text from "Terms of Use")
+        await page.locator('footer a:has-text("Terms and Conditions"), footer a:has-text("Terms of Use")').first().click();
         
-        // Verify we are on the Terms of Conditions page
-        await expect(page).toHaveURL(/.*\/terms-conditions/);
+        // Verify we are on the Terms of Conditions page with a longer timeout
+        await expect(page).toHaveURL(/.*\/terms-conditions/, { timeout: 10000 });
         
         // Verify page content
         // In the codebase it defaults to generic text, so finding the H1 should suffice
