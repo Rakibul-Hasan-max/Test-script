@@ -36,3 +36,24 @@ This project uses **Playwright** with **TypeScript** and follows the **Page Obje
     ```bash
     npx playwright show-report
     ```
+
+## Royal Blue Theme Test Coverage
+
+The following features of the Royal Blue theme are covered:
+
+- **Navigation**: Verifies navbar links, hero buttons, and section scrolling.
+- **Table Reservation**: Complete flow from finding a table to picking a specific table and providing customer details.
+- **Event Booking**: Browsing events, viewing details, and checking availability.
+- **Authentication**: Login and Registration flows.
+
+## Folder Structure (Professional)
+
+- `pages/royal-blue/`: Page Object Models for the theme.
+- `tests/royal-blue/`: Specific test scenarios for each major feature.
+
+## How to Run Royal Blue Tests
+
+To run the specific tests for this theme:
+```bash
+npx playwright test tests/royal-blue
+```
