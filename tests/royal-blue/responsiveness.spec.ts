@@ -35,7 +35,18 @@ test.describe('Royal Blue - Responsiveness & Button Tests (Mobile)', () => {
         // Check button interaction / hover mechanics if any applied on mobile tap
         await bookTableBtn.click();
         
-        // Assert modal or redirect happens
-        await expect(page.locator('text=Select Your Details')).toBeVisible();
+        // Assert it scrolls to the reservation section
+        await expect(page.locator('#reservation')).toBeVisible();
+
+        // Verify normal booking flow works on mobile
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const dateStr = tomorrow.toISOString().split('T')[0];
+        
+        await homePage.fillReservationForm('2', dateStr, '19:00');
+        await homePage.clickFindTable();
+        
+        // Assert modal opens
+        await expect(page.locator('button:has-text("Confirm Booking")').or(page.locator('text=Select a Table'))).toBeVisible();
     });
 });

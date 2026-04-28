@@ -32,7 +32,20 @@ test.describe('Royal Blue - End-to-End (E2E) Journey', () => {
         // 4. Test Buttons & Interaction on Homepage (User flows)
         await homePage.navigate('https://www.shebaa247.com/');
         await homePage.bookATableButton.click();
-        await expect(page.locator('text=Select Your Details')).toBeVisible();
+        
+        // Verify we are at the reservation section
+        await expect(page.locator('#reservation')).toBeVisible();
+
+        // Fill reservation form to trigger the modal (Normal booking flow)
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const dateStr = tomorrow.toISOString().split('T')[0];
+        
+        await homePage.fillReservationForm('2', dateStr, '19:00');
+        await homePage.clickFindTable();
+
+        // Now the reservation modal should be visible
+        await expect(page.locator('button:has-text("Confirm Booking")').or(page.locator('text=Select a Table'))).toBeVisible();
         await page.locator('button[aria-label="Close"]').first().click(); // Close Modal
 
         // 5. Navigate to full menu and test category buttons
