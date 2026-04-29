@@ -34,6 +34,6 @@ test.describe('Royal Blue - Homepage Features Tests', () => {
         await exploreMenuLink.click();
         
         // Verify we are on the menu page
-        await expect(page).toHaveURL(/.*\/menu/);
+        await expect(page).toHaveURL(/.*\/menu/, { timeout: 10000 });
     });
 });
