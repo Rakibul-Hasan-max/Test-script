@@ -7,13 +7,13 @@ test.describe('Royal Blue - User Profile CRUD and Input Tests', () => {
     let authPage: AuthPage;
     let profilePage: ProfilePage;
     let homePage: HomePage;
-    const timestamp = Date.now();
-    const testEmail = `user${timestamp}@example.com`;
+    let testEmail: string;
 
     test.beforeEach(async ({ page }) => {
         authPage = new AuthPage(page);
         profilePage = new ProfilePage(page);
         homePage = new HomePage(page);
+        testEmail = `user${Date.now()}@example.com`;
         await authPage.navigate('https://www.shebaa247.com/cred/register');
         
         // Register a new user for CRUD test to not affect others
@@ -25,9 +25,21 @@ test.describe('Royal Blue - User Profile CRUD and Input Tests', () => {
             password: 'Password123!'
         });
         
-        // Wait for redirect to home and user modal to signify login success
-        await expect(page).toHaveURL(/.*\/checkout\/cart|\//);
+        // Wait for redirect or check for errors
+        try {
+            await page.waitForURL(/.*\/checkout\/cart|\/$/, { timeout: 15000 });
+        } catch (e) {
+            const error = page.locator('.text-red-500, text=exists, text=required').first();
+            if (await error.isVisible()) {
+                throw new Error(`Registration failed: ${await error.innerText()}`);
+            }
+            throw e;
+        }
+        
+        // Verify login success before clicking User Menu
+        const signOutButton = page.locator('text=Sign Out, text=Logout, text=Sign out, text=Log out').first();
         await homePage.userMenuButton.click();
+        await expect(signOutButton).toBeVisible({ timeout: 10000 });
         
         // Go to Profile via User Menu
         await page.locator('text=My Profile').first().click();

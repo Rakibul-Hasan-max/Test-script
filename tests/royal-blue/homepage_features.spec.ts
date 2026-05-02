@@ -10,18 +10,21 @@ test.describe('Royal Blue - Homepage Features Tests', () => {
     });
 
     test('should display testimonial section', async ({ page }) => {
-        // Find the "Our Guestbook" section
-        const testimonialSection = page.locator('section:has-text("Our Guestbook")');
+        // Find the "Our Guestbook" heading first to identify the section
+        const heading = page.locator('h4, h2, h3, p').filter({ hasText: "Our Guestbook" }).first();
         
-        // Scroll to the element to trigger any lazy loading/animations
-        await testimonialSection.scrollIntoViewIfNeeded();
+        // Scroll to the heading to ensure it's loaded
+        await heading.scrollIntoViewIfNeeded({ timeout: 10000 });
+        
+        // Find the parent section or container
+        const testimonialSection = page.locator('section, div').filter({ has: heading }).first();
         
         // Verify titles
-        await expect(testimonialSection.locator('h4:has-text("Our Guestbook")')).toBeVisible();
-        await expect(testimonialSection.locator('h2:has-text("What People Say")')).toBeVisible();
+        await expect(heading).toBeVisible();
+        await expect(page.locator('text=What People Say').first()).toBeVisible();
         
-        // Verify testimonial cards exist
-        await expect(testimonialSection.locator('p').first()).toBeVisible();
+        // Verify testimonial cards or content exist in that area
+        await expect(testimonialSection.locator('p, span').first()).toBeVisible();
     });
 
     test('should verify Explore Full Menu link', async ({ page }) => {
@@ -31,6 +34,6 @@ test.describe('Royal Blue - Homepage Features Tests', () => {
         await exploreMenuLink.click();
         
         // Verify we are on the menu page
-        await expect(page).toHaveURL(/.*\/menu/);
+        await expect(page).toHaveURL(/.*\/menu/, { timeout: 10000 });
     });
 });

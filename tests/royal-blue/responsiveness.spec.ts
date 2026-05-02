@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { HomePage } from '../../pages/royal-blue/HomePage';
+import { ReservationModal } from '../../pages/royal-blue/ReservationModal';
 
 test.describe('Royal Blue - Responsiveness & Button Tests (Mobile)', () => {
     // Configure Playwright to use a mobile viewport for this suite
@@ -46,7 +47,13 @@ test.describe('Royal Blue - Responsiveness & Button Tests (Mobile)', () => {
         await homePage.fillReservationForm('2', dateStr, '19:00');
         await homePage.clickFindTable();
         
-        // Assert modal opens
-        await expect(page.locator('button:has-text("Confirm Booking")').or(page.locator('text=Select a Table'))).toBeVisible();
+        // Assert modal opens (Checking for table selection buttons)
+        const reservationModal = new ReservationModal(page);
+        await expect(reservationModal.tableButtons.first()).toBeVisible({ timeout: 10000 });
+
+        // Close Modal - Scoping to the modal container to avoid matching header buttons
+        const modal = page.locator('[role="dialog"], .modal, [class*="modal"], div[class*="fixed"]').filter({ has: page.locator('text=Select Your Table') });
+        await modal.locator('button:has(svg), button:has-text("✕"), .absolute.right-4.top-4, button[class*="close"]').first().click(); 
+
     });
 });

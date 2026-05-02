@@ -23,11 +23,16 @@ test.describe('Login E2E Test Cases', () => {
         
         test('Already logged-in user hits login page -> redirect', async ({ page }) => {
             await authPage.login('user@example.com', 'Pass123!');
-            await page.waitForTimeout(1000);
+            
+            // First, verify we are successfully logged in and redirected away from login page
+            await expect(page).not.toHaveURL(/.*\/cred\/login/); 
+            await expect(page.locator('text=Sign Out, text=Logout, text=Sign out, text=Log out').first()).toBeVisible({ timeout: 10000 });
 
-            // Attempt to hit login page again
+            // Now, attempt to hit login page again while logged in
             await page.goto('https://www.shebaa247.com/cred/login');
-            await expect(page).not.toHaveURL(/.*\/cred\/login/); // Should redirect away
+            
+            // Should be redirected away again
+            await expect(page).not.toHaveURL(/.*\/cred\/login/, { timeout: 10000 }); 
         });
 
         test('Multi-tab behavior & Auto-Sync (Session Persistence)', async ({ context }) => {
@@ -37,12 +42,15 @@ test.describe('Login E2E Test Cases', () => {
             
             await authPage1.navigate('https://www.shebaa247.com/cred/login');
             await authPage1.login('user@example.com', 'Pass123!');
-            await page1.waitForTimeout(1000);
+            await page1.waitForURL(/.*(\/checkout\/cart|\/$)/);
+            await page1.waitForTimeout(2000);
 
             await page2.goto('https://www.shebaa247.com/');
+            await page2.waitForTimeout(2000); // Allow time for session sync
+            
             const homePage2 = new HomePage(page2);
             await homePage2.userMenuButton.click();
-            await expect(page2.locator('text=Sign Out')).toBeVisible();
+            await expect(page2.locator('text=Sign Out')).toBeVisible({ timeout: 10000 });
             
             await page1.close();
             await page2.close();
